@@ -1,40 +1,46 @@
-const maria = require('../../maria/maria');
-
-function getUserById(id, callback) {
-
-    maria.query('select * from user where user_id =' + id, function(err, row) {
-        if(err) throw err;
-        if(row[0]) {
-            var result = {result: 'ok', message: '성공하였습니다.', email: row[0].email, name: row[0].name};
-            console.log('userService 성공 : ' + result.email);
-            callback(result);
-        } else {
-            var result = {result: 'none', message: '요청하신 id에 해당하는 사용자 정보가 없습니다.'};
-            console.log('userService 실패 : ' + result);
-            callback(result);
-        }
-    });
-}
+const DB = require('../../maria/maria');
 
 function getUserByIdWithPromise(id) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
 
-        maria.query('select * from user where user_id =' + id, function(err, row) {
+        DB('GET', 'selecta user_id, email, name, phone, profile_image_url, provider from user where user_id = ?', id).then(function(res) {
+            resolve(res);
+        });
+
+        /*
+        await connection1.query('select user_id, email, name, phone, profile_image_url, provider from user where user_id = ?', id, function(err, rows) {
+            if(err) throw new Error(err);
+            if(rows.length) {
+                resolve(rows);
+            } else {
+                reject(rows);
+            }
+        }); */
+    });
+};
+
+function joinUserWithPromise(user) {
+    return new Promise( function (resolve, reject) {
+        
+        const existUser = pool.query('SELECT * FROM user WHERE email = "' + user.email + '"', function(err, rows) {
 
             if(err) throw err;
-
-            if(row[0]) {
-                console.log('유저 조회 성공');
-                var result = {result: 'ok', message: '성공하였습니다.', email: row[0].email, name: row[0].name};
-                resolve(result);
-            } else {
-                console.log('유저 조회 실패');
-                var result = {result: 'none', message: '요청하신 id에 해당하는 사용자 정보가 없습니다.'};
+            if(rows.length) {
+                var result = {result: 'fail', message: '이미 등록된 유저입니다. 로그인하시기 바랍니다.'};
                 reject(result);
+            } else {
+                
+                const savedUser = pool.query('INSERT INTO user SET ? ', user, function(err, rows) {
+                    if(err) throw new Error(err);
+                    var result = {result: 'ok', message: "성공하였습니다.", data: {insertId: rows.insertId}};
+                    resolve(result);
+                });
             }
         });
     });
 };
 
-module.exports.getUserById = getUserById;
-module.exports.getUserByIdWithPromise = getUserByIdWithPromise;
+module.exports = {
+    getUserByIdWithPromise,
+    joinUserWithPromise
+}
