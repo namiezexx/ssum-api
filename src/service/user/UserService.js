@@ -5,8 +5,8 @@ require('dotenv').config();
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
-async function getUserByIdWithPromise(id) {
-    var user = await DB('GET', 'select user_id, email, name, phone, profile_image_url, provider from user where user_id = ?', id);
+async function getUserByIdWithPromise(email) {
+    var user = await DB('GET', 'select user_id, email, name, phone, profile_image_url, provider from user where email = ?', email);
     if(user.data.length == 1) {
         const token = jwt.sign({
             userId: user.data[0].email  // jwt 토근에 등록할 key 값으로 user 정보 중 email을 key로 사용한다.

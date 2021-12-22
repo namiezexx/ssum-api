@@ -3,11 +3,11 @@ const userRouter = express.Router();
 const {getUserByIdWithPromise, joinUserWithPromise} = require('../../service/user/UserService');
 const {verifyToken} = require('../middlewares/authorization');
 
-userRouter.get('/:id', function(req, res) {
+userRouter.post('/login', function(req, res) {
 
-    const id = req.params.id;
+    const email = req.body.email;
 
-    getUserByIdWithPromise(id)
+    getUserByIdWithPromise(email)
     .then(function(result) {
         console.log(result);
         res.send(result);
