@@ -1,23 +1,23 @@
 const express = require('express');
 const userRouter = express.Router();
-const userService = require('../../service/user/UserService');
+const {getUserByIdWithPromise, joinUserWithPromise} = require('../../service/user/UserService');
+const {verifyToken} = require('../middlewares/authorization');
 
 userRouter.get('/:id', function(req, res) {
 
     const id = req.params.id;
 
-    userService.getUserByIdWithPromise(id)
-    .then(function (result) {
-        var responseMessage = {result: 'ok', message: '성공하였습니다.', data: result};
-        res.send(responseMessage);
+    getUserByIdWithPromise(id)
+    .then(function(result) {
+        console.log(result);
+        res.send(result);
     })
-    .catch(function (error) {
-        var responseMessage = {result: 'fail', message: '요청하신 id에 해당하는 사용자 정보가 없습니다.'};
-        res.send(responseMessage);
+    .catch(function(err) {
+        res.status(500).send({msg: 'error test'});
     });
 });
 
-userRouter.post('/join', function(req, res) {
+userRouter.post('/join', verifyToken, function(req, res) {
 
     const user = {
         email: req.body.email,
@@ -26,14 +26,14 @@ userRouter.post('/join', function(req, res) {
         phone: req.body.phone
     };
 
-    console.log(user);
+    //console.log(res.locals);
 
-    userService.joinUserWithPromise(user)
+    joinUserWithPromise(user)
     .then(function (result) {
         res.send(result);
     })
     .catch(function (error) {
-        res.send(error);
+        res.status(500).send(error);
     });
 });
 

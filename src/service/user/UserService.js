@@ -1,43 +1,26 @@
 const DB = require('../../maria/maria');
 
-function getUserByIdWithPromise(id) {
-    return new Promise(async function (resolve, reject) {
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-        DB('GET', 'selecta user_id, email, name, phone, profile_image_url, provider from user where user_id = ?', id).then(function(res) {
-            resolve(res);
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+
+async function getUserByIdWithPromise(id) {
+    var user = await DB('GET', 'select user_id, email, name, phone, profile_image_url, provider from user where user_id = ?', id);
+    if(user.data.length == 1) {
+        const token = jwt.sign({
+            userId: user.data[0].email  // jwt 토근에 등록할 key 값으로 user 정보 중 email을 key로 사용한다.
+        }, JWT_SECRET_KEY, {
+            expiresIn: '1h'
         });
 
-        /*
-        await connection1.query('select user_id, email, name, phone, profile_image_url, provider from user where user_id = ?', id, function(err, rows) {
-            if(err) throw new Error(err);
-            if(rows.length) {
-                resolve(rows);
-            } else {
-                reject(rows);
-            }
-        }); */
-    });
+        user.token = token;
+        return user;
+    }
 };
 
-function joinUserWithPromise(user) {
-    return new Promise( function (resolve, reject) {
-        
-        const existUser = pool.query('SELECT * FROM user WHERE email = "' + user.email + '"', function(err, rows) {
-
-            if(err) throw err;
-            if(rows.length) {
-                var result = {result: 'fail', message: '이미 등록된 유저입니다. 로그인하시기 바랍니다.'};
-                reject(result);
-            } else {
-                
-                const savedUser = pool.query('INSERT INTO user SET ? ', user, function(err, rows) {
-                    if(err) throw new Error(err);
-                    var result = {result: 'ok', message: "성공하였습니다.", data: {insertId: rows.insertId}};
-                    resolve(result);
-                });
-            }
-        });
-    });
+async function joinUserWithPromise(user) {
+    return await DB('INSERT', 'insert into user set ?', user);
 };
 
 module.exports = {

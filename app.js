@@ -4,6 +4,8 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const mainRouter = require('./src/router/MainRouter');
 
+require('dotenv').config();
+
 // Logger 설정
 app.use(logger("[:remote-addr][:method][:url][:date][:status]"), function(req, res, next) {
     next();
@@ -32,6 +34,6 @@ app.use(function(err, req, res, next){
 });
 
 // 서버 기동
-app.listen(3000, function() {
+app.listen(process.env.APP_PORT || 3000, function() {
     console.log('start! express server on 3000');
 });
