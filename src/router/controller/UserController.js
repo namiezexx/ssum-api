@@ -81,6 +81,7 @@ userRouter.put('/user', verifyToken, function(req, res) {
     })
 });
 
+
 userRouter.delete('/user', verifyToken, function(req, res) {
     
     const email = res.locals.user_email;
