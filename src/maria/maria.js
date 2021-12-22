@@ -20,6 +20,7 @@ const DB = async(type, sql, params) => { // async, await
         //console.log(rows[0]);
         
         result.code = 0;
+        result.message = '성공하였습니다.';
         result.length = rows.length;
         if(type == "GET" && rows.length > 0) result.data = rows;
         connection.release(); // 사용된 풀 반환
