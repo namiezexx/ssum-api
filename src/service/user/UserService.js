@@ -3,11 +3,23 @@ const DB = require('../../maria/maria');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+const bcrypt = require('bcrypt');
+
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
-async function loginUser(email) {
-    var user = await DB('GET', 'select user_id, email, name, phone, profile_image_url, provider from user where email = ?', email);
-    if(user.data.length == 1) {
+async function loginUser(email, password) {
+    var user = await DB('GET', 'select user_id, email, password, name, phone, profile_image_url, provider from user where email = ?', email);
+
+    if(user.length == 0) {
+        return {code: -1, msg: "사용자 조회 오류. 로그인 정보를 확인하세요."};
+    }
+
+    const verified = bcrypt.compareSync(password, user.data[0].password);
+    if(verified == false) {
+        return {code: -1, msg: "비밀번호를 확인하세요."};
+    }
+
+    if(user.length == 1) {
         const accessToken = jwt.sign({
             userId: user.data[0].email  // jwt 토근에 등록할 key 값으로 user 정보 중 email을 key로 사용한다.
         }, JWT_SECRET_KEY, {
@@ -26,6 +38,11 @@ async function loginUser(email) {
 };
 
 async function joinUserWithPromise(user) {
+
+    const encryptedPassword = await bcrypt.hash(user.password, 10);
+
+    user.password = encryptedPassword;
+
     return await DB('INSERT', 'insert into user set ?', user);
 };
 

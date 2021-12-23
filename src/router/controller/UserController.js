@@ -6,18 +6,23 @@ const {verifyToken} = require('../middlewares/authorization');
 userRouter.post('/login', function(req, res) {
 
     const email = req.body.email;
+    const password = req.body.password;
 
-    loginUser(email)
+    loginUser(email, password)
     .then(function(result) {
         res.send(result);
     })
     .catch(function(err) {
+        console.log(err);
         res.status(500).send({msg: 'error test'});
     });
 });
 
-userRouter.post('/join', verifyToken, function(req, res) {
+userRouter.post('/join', function(req, res) {
 
+    const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    console.log(clientIp);
+    
     const user = {
         email: req.body.email,
         name: req.body.name,

@@ -3,13 +3,17 @@ const app = express();
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const mainRouter = require('./src/router/MainRouter');
-
 require('dotenv').config();
+
+const cors = require('cors');
 
 // Logger 설정
 app.use(logger("[:remote-addr][:method][:url][:date][:status]"), function(req, res, next) {
     next();
 });
+
+// cors option 설정
+app.use(cors());
 
 // request의 body 데이타를 json으로 parsing하는 미들웨어
 app.use(bodyParser.json());
