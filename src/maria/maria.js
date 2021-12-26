@@ -1,6 +1,7 @@
 const maria = require('mysql2/promise');
 const conf = require('./conf');
 const pool = maria.createPool(conf.db_info);
+const customError = require('../error/custom-error');
 
 const DB = async(type, sql, params) => { // async, await
     
@@ -26,12 +27,16 @@ const DB = async(type, sql, params) => { // async, await
         connection.release(); // 사용된 풀 반환
         return result;
     } catch (err) {
+        connection.release();
+        throw new customError(-1001, 'db처리 오류! 거래로그 확인 요망.');
+        /*
         result.code = -1;
         result.message = '실패하였습니다.';
         result.error = err;
         connection.release();
         console.log(err);
         throw result;
+        */
     }
 }
 

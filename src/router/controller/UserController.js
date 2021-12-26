@@ -1,20 +1,22 @@
 const express = require('express');
 const userRouter = express.Router();
+const logger = require('../../config/logger');
 const {loginUser, joinUserWithPromise, getUserByEmail, getUsers, updateUser, deleteUser} = require('../../service/user/UserService');
 const {verifyToken} = require('../middlewares/authorization');
 
-userRouter.post('/login', function(req, res) {
+userRouter.post('/login', function(req, res, next) {
 
     const email = req.body.email;
     const password = req.body.password;
 
     loginUser(email, password)
     .then(function(result) {
+        logger.http(result);
         res.send(result);
     })
     .catch(function(err) {
-        console.log(err);
-        res.status(500).send({msg: 'error test'});
+        next(err);
+        //res.status(500).send({msg: 'error test', message: err.message});
     });
 });
 

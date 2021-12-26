@@ -1,13 +1,16 @@
 const express = require('express');
 const app = express();
 //const logger = require('morgan');
-//const logger = require('./src/config/logger');
+const logger = require('./src/config/logger');
+const errorHandler = require('./src/error/error-handler');
+const customError = require('./src/error/custom-error');
 const morganMiddleware = require('./src/config/morganMiddleware');
 const bodyParser = require('body-parser');
 const mainRouter = require('./src/router/MainRouter');
 require('dotenv').config();
 
 const cors = require('cors');
+const res = require('express/lib/response');
 
 // Logger 설정
 /* app.use(logger("[:remote-addr][:method][:url][:date][:status]"), function(req, res, next) {
@@ -22,6 +25,7 @@ app.use(bodyParser.json());
 // body 데이타 내부에 중첩된 구문을 parsing하는 옵션
 app.use(bodyParser.urlencoded({extended:true}));
 
+//app.use(logger);
 app.use(morganMiddleware);
 /*
 app.use((req, res, next) => {
@@ -39,19 +43,7 @@ app.use((req, res, next) => {
 // mainRouter 등록
 app.use(mainRouter);
 
-// 전역 예외처리 function
-app.use(function(req, res, next) {
-    const err = new Error();
-    err.code = -1;
-    err.message = 'Incorrect Uri';
-    next(err);
-});
-
-app.use(function(err, req, res, next){
-    const code = err.code || -9999;
-    const message = err.message || 'something wrong!';
-    res.status(500).send({code: code, message: message});
-});
+app.use(errorHandler);
 
 // 서버 기동
 app.listen(process.env.APP_PORT || 3000, function() {

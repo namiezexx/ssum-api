@@ -1,5 +1,5 @@
 const DB = require('../../maria/maria');
-
+const customError = require('../../error/custom-error');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -11,12 +11,12 @@ async function loginUser(email, password) {
     var user = await DB('GET', 'select user_id, email, password, name, phone, profile_image_url, provider from user where email = ?', email);
 
     if(user.length == 0) {
-        return {code: -1, msg: "사용자 조회 오류. 로그인 정보를 확인하세요."};
+        throw new customError(-1002, '사용자 조회 오류. 이메일을 확인하세요.');
     }
 
     const verified = bcrypt.compareSync(password, user.data[0].password);
     if(verified == false) {
-        return {code: -1, msg: "비밀번호를 확인하세요."};
+        throw new customError(-1003, '비밀번호 확인 요망.');
     }
 
     if(user.length == 1) {
