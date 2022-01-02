@@ -6,6 +6,8 @@ const {verifyToken} = require('../middlewares/authorization');
 
 userRouter.post('/login', function(req, res, next) {
 
+    logger.http(req.body);
+    
     const email = req.body.email;
     const password = req.body.password;
 
@@ -16,7 +18,6 @@ userRouter.post('/login', function(req, res, next) {
     })
     .catch(function(err) {
         next(err);
-        //res.status(500).send({msg: 'error test', message: err.message});
     });
 });
 

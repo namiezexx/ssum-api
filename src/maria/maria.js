@@ -29,14 +29,6 @@ const DB = async(type, sql, params) => { // async, await
     } catch (err) {
         connection.release();
         throw new customError(-1001, 'db처리 오류! 거래로그 확인 요망.');
-        /*
-        result.code = -1;
-        result.message = '실패하였습니다.';
-        result.error = err;
-        connection.release();
-        console.log(err);
-        throw result;
-        */
     }
 }
 

@@ -2,11 +2,9 @@ const express = require('express');
 const app = express();
 //const logger = require('morgan');
 const logger = require('./src/config/logger');
-const errorHandler = require('./src/error/error-handler');
-const customError = require('./src/error/custom-error');
 const morganMiddleware = require('./src/config/morganMiddleware');
 const bodyParser = require('body-parser');
-const mainRouter = require('./src/router/MainRouter');
+const mainRouter = require('./src/router/mainRouter');
 require('dotenv').config();
 
 const cors = require('cors');
@@ -26,7 +24,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 
 //app.use(logger);
-app.use(morganMiddleware);
+//app.use(morganMiddleware);
 /*
 app.use((req, res, next) => {
     logger.info('==================== req ====================');
@@ -42,8 +40,6 @@ app.use((req, res, next) => {
 
 // mainRouter 등록
 app.use(mainRouter);
-
-app.use(errorHandler);
 
 // 서버 기동
 app.listen(process.env.APP_PORT || 3000, function() {
