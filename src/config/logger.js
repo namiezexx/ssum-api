@@ -1,4 +1,5 @@
 const winston = require('winston');
+const rTracer = require('cls-rtracer');
 require('winston-daily-rotate-file');
 const logDir = './logs';
 
@@ -30,7 +31,12 @@ const format = winston.format.combine(
     winston.format.timestamp({ format: ' YYYY-MM-DD HH:MM:SS ||' }), 
     winston.format.colorize({ all: true }), 
     winston.format.printf( 
-        (info) => `${info.timestamp} [ ${info.level} ]  [ ${info.id} ] ▶ ${info.message}`, 
+        (info) => {
+            const rid = rTracer.id();
+            return rid
+                ? `${info.timestamp}: ${info.level} : [request-id:${rid}]: ${info.message}`
+                : `${info.timestamp}: ${info.level} : ${info.message}`
+        }
     ), 
 ) 
 

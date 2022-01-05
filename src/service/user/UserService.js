@@ -1,22 +1,26 @@
 const DB = require('../../maria/maria');
-const customError = require('../../error/custom-error');
+const NotFoundError = require('../../error/advice/NotFoundError');
+const ValidationError = require('../../error/advice/ValidationError');
+const responseService = require('../responseService');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const bcrypt = require('bcrypt');
+const res = require('express/lib/response');
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 async function loginUser(email, password) {
+    
     var user = await DB('GET', 'select user_id, email, password, name, phone, profile_image_url, provider from user where email = ?', email);
 
     if(user.length == 0) {
-        throw new customError(-1002, '사용자 조회 오류. 이메일을 확인하세요.');
+        throw new NotFoundError(-1002, '사용자 조회 오류. 이메일을 확인하세요.');
     }
 
     const verified = bcrypt.compareSync(password, user.data[0].password);
     if(verified == false) {
-        throw new customError(-1003, '비밀번호 확인 요망.');
+        throw new ValidationError(-1003, '사용자 비밀번호 확인 요망.');
     }
 
     if(user.length == 1) {
@@ -32,7 +36,9 @@ async function loginUser(email, password) {
             expiresIn: '240h'
         });
         
-        return {code: 0, msg: "성공하였습니다.", data:{accessToken: accessToken, refreshToken: refreshToken}};
+        const data = {accessToken: accessToken, refreshToken: refreshToken};
+
+        return responseService(data);
         
     }
 };
@@ -43,36 +49,45 @@ async function joinUserWithPromise(user) {
 
     user.password = encryptedPassword;
 
-    return await DB('INSERT', 'insert into user set ?', user);
+    const data = await DB('INSERT', 'insert into user set ?', user);
+
+    return responseService(data);
 };
 
 async function getUserByEmail(email) {
-    return await DB('GET', 'select user_id, email, name, phone, profile_image_url, provider from user where email = ?', email);
+
+    const data = await DB('GET', 'select user_id, email, name, phone, profile_image_url, provider from user where email = ?', email);
+    return responseService(data);
 };
 
 async function getUsers(page) {
+
     const result = await DB('GET', 'select user_id, email, name, phone, profile_image_url, provider from user order by user_id desc limit ?, ?', [(10 * (page-1)), 10]);
     const count = await DB('GET', 'select count(*) as totalItems from user');
 
-    result.totalItems = count.data[0].totalItems;
-    result.totalPages = Math.ceil(result.totalItems / 10);
-    result.first = false;
-    result.last = false;
+    data.totalItems = count.data[0].totalItems;
+    data.totalPages = Math.ceil(result.totalItems / 10);
+    data.first = false;
+    data.last = false;
 
-    if(page == 1)                 result.first = true;
-    if(page == result.totalPages) result.last = true;
+    if(page == 1)                 data.first = true;
+    if(page == data.totalPages) data.last = true;
     
-    return result;
+    return responseService(data);
 };
 
 async function updateUser(email, user) {
-    await DB('UPDATE', 'update user set ? where email = ?', [user, email]);
-    console.log(email);
-    return await DB('GET', 'select user_id, email, name, phone, profile_image_url, provider from user where email = ?', email);
+
+    const data = await DB('UPDATE', 'update user set ? where email = ?', [user, email]);
+
+    return responseService(data);
 };
 
 async function deleteUser(email) {
-    return await DB('DELETE', 'delete from user where email = ?', email);
+
+    const data = await DB('DELETE', 'delete from user where email = ?', email);
+
+    return responseService(data);
 };
 
 module.exports = {

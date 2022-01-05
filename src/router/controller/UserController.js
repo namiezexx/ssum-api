@@ -1,31 +1,23 @@
 const express = require('express');
 const userRouter = express.Router();
 const logger = require('../../config/logger');
-const {loginUser, joinUserWithPromise, getUserByEmail, getUsers, updateUser, deleteUser} = require('../../service/user/UserService');
+const {loginUser, joinUserWithPromise, getUserByEmail, getUsers, updateUser, deleteUser} = require('../../service/user/userService');
 const {verifyToken} = require('../middlewares/authorization');
 
 userRouter.post('/login', function(req, res, next) {
 
-    logger.http(req.body);
-    
-    const email = req.body.email;
-    const password = req.body.password;
+    email = req.body.email;
+    password = req.body.password;
 
-    loginUser(email, password)
+    loginUser(req.body.email, req.body.password)
     .then(function(result) {
-        logger.http(result);
-        res.send(result);
+        res.json(result);
     })
-    .catch(function(err) {
-        next(err);
-    });
+    .catch(next);
 });
 
-userRouter.post('/join', function(req, res) {
+userRouter.post('/join', function(req, res, next) {
 
-    const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    console.log(clientIp);
-    
     const user = {
         email: req.body.email,
         name: req.body.name,
@@ -36,11 +28,9 @@ userRouter.post('/join', function(req, res) {
 
     joinUserWithPromise(user)
     .then(function (result) {
-        res.send(result);
+        res.json(result);
     })
-    .catch(function (err) {
-        res.status(500).send(err);
-    });
+    .catch(next);
 });
 
 userRouter.get('/user', verifyToken, function(req, res) {
@@ -49,11 +39,9 @@ userRouter.get('/user', verifyToken, function(req, res) {
 
     getUserByEmail(res.locals.user_email)
     .then(function(result) {
-        res.send(result);
+        res.json(result);
     })
-    .catch(function (err){
-        res.status(500).send(err);
-    });
+    .catch(next);
 });
 
 userRouter.get('/user/:page', verifyToken, function(req, res) {
@@ -61,11 +49,9 @@ userRouter.get('/user/:page', verifyToken, function(req, res) {
 
     getUsers(page)
     .then(function(result) {
-        res.send(result);
+        res.json(result);
     })
-    .catch(function(err) {
-        res.status(500).send(err);
-    })
+    .catch(next);
 });
 
 userRouter.put('/user', verifyToken, function(req, res) {
@@ -82,11 +68,9 @@ userRouter.put('/user', verifyToken, function(req, res) {
 
     updateUser(email, user)
     .then(function(result) {
-        res.send(result);
+        res.json(result);
     })
-    .catch(function(err) {
-        res.status(500).send(err);
-    })
+    .catch(next);
 });
 
 
@@ -96,11 +80,9 @@ userRouter.delete('/user', verifyToken, function(req, res) {
 
     deleteUser(email)
     .then(function(result) {
-        res.send(result);
+        res.json(result);
     })
-    .catch(function(err) {
-        res.status(500).send(err);
-    })
+    .catch(next);
 });
 
 module.exports = userRouter;

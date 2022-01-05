@@ -1,9 +1,9 @@
-class CustomError extends Error {
+class DatabaseError extends Error {
     constructor(code, message, ...params) {
         super(...params);
 
         if(Error.captureStackTrace) {
-            Error.captureStackTrace(this, CustomError);
+            Error.captureStackTrace(this, DatabaseError);
         }
 
         this.code = code;
@@ -11,4 +11,4 @@ class CustomError extends Error {
     };
 }
 
-module.exports = CustomError;
+module.exports = DatabaseError;
