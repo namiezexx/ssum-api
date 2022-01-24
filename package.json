@@ -7,7 +7,11 @@
     "api-docs": "swagger-cli bundle src/swagger/openapi.yaml --outfile src/swagger/build.yaml --type yaml",
     "prestart": "npm run api-docs",
     "start": "nodemon app.js",
-    "test": "mocha test.spec.js -exit"
+    "test": "mocha test.spec.js -exit",
+    "build": "pkg ."
+  },
+  "bin": {
+    "app": "app.js"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +35,7 @@
   },
   "devDependencies": {
     "jest": "^27.4.7",
+    "pkg": "^5.5.2",
     "supertest": "^6.2.1",
     "swagger-jsdoc": "^6.1.0",
     "swagger-ui-express": "^4.3.0"

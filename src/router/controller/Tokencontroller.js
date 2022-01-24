@@ -1,7 +1,7 @@
 const express = require('express');
 const tokenRouter = express.Router();
 
-const {getUserByEmail} = require('../../service/user/UserService');
+const {getUserByEmail} = require('../../service/user/userService');
 
 const jwt = require('jsonwebtoken');
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -13,6 +13,7 @@ tokenRouter.post('/refresh/token', function(req, res) {
     const decoded = jwt.verify(token, JWT_SECRET_KEY);
 
     const email = decoded.userId;
+    
     
     getUserByEmail(email)
     .then(function(result) {
