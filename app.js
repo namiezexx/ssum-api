@@ -25,6 +25,8 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 app.use(rTracer.expressMiddleware())
 
+console.log(process.env.NODE_ENV);
+
 // mainRouter 등록
 app.use(mainRouter);
 
