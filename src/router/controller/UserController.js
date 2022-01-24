@@ -4,6 +4,35 @@ const logger = require('../../config/logger');
 const {loginUser, joinUserWithPromise, getUserByEmail, getUsers, updateUser, deleteUser} = require('../../service/user/userService');
 const {verifyToken} = require('../middlewares/authorization');
 
+/**
+ * @swagger
+ * paths:
+ *   /login:
+ *     post:
+ *       summary: 로그인 로직 처리
+ *       consumes:
+ *         - application/json
+ *       parameters:
+ *         - in: body
+ *           name: login
+ *           description: 사용자 로그인 정보
+ *           schema:
+ *             $ref: '#/definitions/Login'
+ *       responses:
+ *         "200":
+ *           description: 로그인 성공
+ * definitions:
+ *   Login:
+ *     type: object
+ *     required:
+ *       - email
+ *       - password
+ *     properties:
+ *       email:
+ *         type: string
+ *       password:
+ *         type: string
+ */
 userRouter.post('/login', function(req, res, next) {
 
     email = req.body.email;

@@ -6,6 +6,12 @@ const bodyParser = require('body-parser');
 const mainRouter = require('./src/router/mainRouter');
 require('dotenv').config();
 
+// swagger 설정
+const swaggerUi = require('swagger-ui-express');
+const yaml = require('yamljs');
+const swaggerSpec = yaml.load("./src/swagger/build.yaml");
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 const cors = require('cors');
 const res = require('express/lib/response');
 
@@ -26,3 +32,5 @@ app.use(mainRouter);
 app.listen(process.env.APP_PORT || 3000, function() {
     console.log('start! express server on 3000');
 });
+
+module.exports = app;

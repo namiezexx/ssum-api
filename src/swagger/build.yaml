@@ -1,0 +1,55 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: 창작지원 API Docs
+  description: 창작지원 API 문서입니다.
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /v1/login:
+    post:
+      security:
+        securitySchemes:
+          - type: apiKey
+            in: header
+            name: X-API-KEY
+      summary: Get all promises
+      requestBody:
+        description: 창작지원 플랫폼 기본 API
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              example:
+                email: test9999@naver.com
+                password: '12345'
+      responses:
+        '200':
+          description: 정상 응답
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+components:
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: basic
+      in: header
+      bearerFormat: JWT
+security:
+  - jwt: []
